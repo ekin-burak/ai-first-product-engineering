@@ -12,7 +12,7 @@ export const chatTools = {
   searchProducts: tool({
     description:
       "Search the product catalog by name, category, or keyword. Use this when the customer asks about products, wants recommendations, or asks what is available. Returns matching products with full details including price, availability, and ratings.",
-    parameters: z.object({
+    inputSchema: z.object({
       query: z
         .string()
         .describe("Search query - product name, category, or keyword in English or Arabic"),
@@ -21,13 +21,13 @@ export const chatTools = {
       const results = searchProducts(query);
       if (results.length === 0) {
         return {
-          found: false,
+          found: false as const,
           message: "No products found matching the query.",
           query,
         };
       }
       return {
-        found: true,
+        found: true as const,
         count: results.length,
         products: results.map((p) => ({
           id: p.id,
@@ -46,16 +46,16 @@ export const chatTools = {
   getProductDetails: tool({
     description:
       "Get detailed information about a specific product by its ID (e.g. PRD-001). Use this when the customer asks about a specific product they already know, or when you need full details after a search.",
-    parameters: z.object({
+    inputSchema: z.object({
       productId: z.string().describe("The product ID, e.g. PRD-001"),
     }),
     execute: async ({ productId }) => {
       const product = getProductById(productId.toUpperCase());
       if (!product) {
-        return { found: false, message: `No product found with ID ${productId}` };
+        return { found: false as const, message: `No product found with ID ${productId}` };
       }
       return {
-        found: true,
+        found: true as const,
         product: {
           id: product.id,
           name: product.name,
@@ -75,7 +75,7 @@ export const chatTools = {
   trackOrder: tool({
     description:
       "Track an order by order ID (e.g. ORD-10234) or customer email. Returns the current status, full status timeline, shipping details, and estimated delivery. Use this when the customer asks about their order status, delivery time, or tracking information.",
-    parameters: z.object({
+    inputSchema: z.object({
       orderId: z
         .string()
         .optional()
@@ -89,10 +89,10 @@ export const chatTools = {
       if (orderId) {
         const order = getOrderById(orderId);
         if (!order) {
-          return { found: false, message: `No order found with ID ${orderId}. Please verify the order number.` };
+          return { found: false as const, message: `No order found with ID ${orderId}. Please verify the order number.` };
         }
         return {
-          found: true,
+          found: true as const,
           order: {
             id: order.id,
             items: order.items.map((i) => ({
@@ -117,10 +117,10 @@ export const chatTools = {
       if (email) {
         const orders = getOrdersByEmail(email);
         if (orders.length === 0) {
-          return { found: false, message: `No orders found for ${email}` };
+          return { found: false as const, message: `No orders found for ${email}` };
         }
         return {
-          found: true,
+          found: true as const,
           count: orders.length,
           orders: orders.map((o) => ({
             id: o.id,
@@ -133,7 +133,7 @@ export const chatTools = {
       }
 
       return {
-        found: false,
+        found: false as const,
         message: "Please provide an order ID or email address to track your order.",
       };
     },
@@ -142,7 +142,7 @@ export const chatTools = {
   handleReturn: tool({
     description:
       "Handle return and refund inquiries. This tool checks the return policy for the product category, verifies order eligibility, and can initiate a return request. Use this when the customer wants to return a product, asks about the return policy, or requests a refund.",
-    parameters: z.object({
+    inputSchema: z.object({
       orderId: z.string().describe("The order ID for the return, e.g. ORD-10235"),
       productId: z
         .string()
@@ -161,7 +161,7 @@ export const chatTools = {
     execute: async ({ orderId, productId, action, reason }) => {
       const order = getOrderById(orderId);
       if (!order) {
-        return { success: false, message: `Order ${orderId} not found. Please verify your order number.` };
+        return { success: false as const, message: `Order ${orderId} not found. Please verify your order number.` };
       }
 
       const targetItem = productId
@@ -170,7 +170,7 @@ export const chatTools = {
 
       if (!targetItem) {
         return {
-          success: false,
+          success: false as const,
           message: `Product ${productId} not found in order ${orderId}.`,
           orderItems: order.items.map((i) => ({
             productId: i.productId,
@@ -185,10 +185,10 @@ export const chatTools = {
 
       if (action === "check_policy") {
         if (!policy) {
-          return { success: true, message: "Standard 14-day return policy applies." };
+          return { success: true as const, message: "Standard 14-day return policy applies." };
         }
         return {
-          success: true,
+          success: true as const,
           policy: {
             category: categoryEn,
             returnWindow: `${policy.returnWindowDays} days`,
@@ -202,7 +202,7 @@ export const chatTools = {
       if (action === "check_eligibility" || action === "initiate_return") {
         if (order.currentStatus === "cancelled") {
           return {
-            success: false,
+            success: false as const,
             eligible: false,
             message: "This order has been cancelled. Returns are not applicable.",
           };
@@ -210,7 +210,7 @@ export const chatTools = {
 
         if (order.currentStatus !== "delivered") {
           return {
-            success: false,
+            success: false as const,
             eligible: false,
             message: `This order is currently "${order.currentStatus}". Returns can only be initiated for delivered orders.`,
             currentStatus: order.currentStatus,
@@ -234,7 +234,7 @@ export const chatTools = {
 
         if (!isWithinWindow) {
           return {
-            success: false,
+            success: false as const,
             eligible: false,
             message: `The ${windowDays}-day return window has expired. The order was delivered ${daysSinceDelivery} days ago.`,
           };
@@ -242,7 +242,7 @@ export const chatTools = {
 
         if (action === "check_eligibility") {
           return {
-            success: true,
+            success: true as const,
             eligible: true,
             message: `This item is eligible for return. ${daysSinceDelivery} of ${windowDays} days remaining in the return window.`,
             conditions: policy?.conditions,
@@ -252,7 +252,7 @@ export const chatTools = {
 
         if (!reason) {
           return {
-            success: false,
+            success: false as const,
             message: "A reason is required to initiate a return. Please ask the customer why they want to return the item.",
           };
         }
@@ -263,7 +263,7 @@ export const chatTools = {
         );
         if (alreadyRequested) {
           return {
-            success: false,
+            success: false as const,
             message: "A return request already exists for this item.",
             existingRequests: existingReturns,
           };
@@ -275,7 +275,7 @@ export const chatTools = {
           reason
         );
         return {
-          success: true,
+          success: true as const,
           message: "Return request created successfully.",
           returnRequest: {
             id: returnRequest.id,
@@ -292,14 +292,14 @@ export const chatTools = {
         };
       }
 
-      return { success: false, message: "Invalid action specified." };
+      return { success: false as const, message: "Invalid action specified." };
     },
   }),
 
   escalateToHuman: tool({
     description:
       "Escalate the conversation to a human support agent. Use this when: the customer explicitly asks to speak with a human, the issue is too complex to resolve, the customer is clearly frustrated or upset, or the inquiry involves sensitive account/payment issues.",
-    parameters: z.object({
+    inputSchema: z.object({
       reason: z
         .string()
         .describe("Brief summary of why the conversation is being escalated"),
@@ -311,12 +311,13 @@ export const chatTools = {
         .describe("Summary of the conversation so far to hand off to the human agent"),
     }),
     execute: async ({ reason, priority, conversationSummary }) => {
+      const ticketId = `TKT-${Date.now().toString(36).toUpperCase()}`;
       return {
-        success: true,
-        ticketId: `TKT-${Date.now().toString(36).toUpperCase()}`,
+        success: true as const,
+        ticketId,
         message: {
-          en: `Your conversation has been escalated to a human agent (Priority: ${priority}). A support representative will be with you shortly. Your reference number is noted above.`,
-          ar: `تم تحويل محادثتك إلى وكيل بشري (الأولوية: ${priority}). سيكون ممثل الدعم معك قريباً. رقم المرجع الخاص بك مذكور أعلاه.`,
+          en: `Your conversation has been escalated to a human agent (Priority: ${priority}). A support representative will be with you shortly. Your reference number is ${ticketId}.`,
+          ar: `تم تحويل محادثتك إلى وكيل بشري (الأولوية: ${priority}). سيكون ممثل الدعم معك قريباً. رقم المرجع الخاص بك هو ${ticketId}.`,
         },
         reason,
         priority,
