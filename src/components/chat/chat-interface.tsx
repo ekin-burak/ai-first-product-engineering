@@ -30,8 +30,8 @@ export function ChatInterface() {
   const { messages, sendMessage, status, setMessages } = useChat({
     onFinish: ({ message }) => {
       const text = getTextContent(message);
-      if (text && hasArabic(text)) {
-        setLocale("ar");
+      if (text) {
+        setLocale(hasArabic(text) ? "ar" : "en");
       }
     },
   });
@@ -61,9 +61,7 @@ export function ChatInterface() {
 
   const handleQuickAction = useCallback(
     (message: string) => {
-      if (hasArabic(message)) {
-        setLocale("ar");
-      }
+      setLocale(hasArabic(message) ? "ar" : "en");
       sendMessage({ text: message });
     },
     [sendMessage, setLocale]
@@ -72,7 +70,7 @@ export function ChatInterface() {
   const isEmpty = messages.length === 0;
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-lg">
+    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-border/60 bg-background/80 shadow-xl shadow-indigo-500/5 backdrop-blur-sm">
       <ChatHeader onReset={handleReset} />
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
@@ -114,7 +112,7 @@ function WelcomeScreen({
 
   return (
     <div className="flex h-full flex-col items-center justify-center gap-6 px-6 py-12">
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary/15 to-violet-500/10 ring-1 ring-primary/10">
         <Bot className="h-8 w-8 text-primary" />
       </div>
       <div className="max-w-sm text-center" dir={isRtl ? "rtl" : "ltr"}>

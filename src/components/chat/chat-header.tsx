@@ -12,9 +12,9 @@ export function ChatHeader({ onReset }: ChatHeaderProps) {
   const { t, toggleLocale } = useLocale();
 
   return (
-    <header className="flex items-center justify-between border-b border-border bg-card px-4 py-3 sm:px-6">
+    <header className="flex items-center justify-between border-b border-border/60 bg-gradient-to-r from-card to-card/80 px-4 py-3 sm:px-6">
       <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary">
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-indigo-600">
           <Bot className="h-5 w-5 text-primary-foreground" />
         </div>
         <div>

@@ -1,81 +1,84 @@
 import { ReturnPolicy, ReturnRequest } from "@/types";
 
+const sharedConditions = [
+  { en: "Item must be in original condition, unused, and with all tags and packaging intact", ar: "يجب أن يكون المنتج في حالته الأصلية، غير مستخدم، مع جميع البطاقات والتغليف سليمة" },
+  { en: "Return shipping costs are the customer's responsibility, unless the return is due to our error", ar: "تكاليف شحن الإرجاع على حساب العميل، ما لم يكن الإرجاع بسبب خطأ من طرفنا" },
+];
+
+const standardRefundMethod = {
+  en: "Original payment method within 4 business days of receiving the returned item. Shipping costs are non-refundable.",
+  ar: "طريقة الدفع الأصلية خلال 4 أيام عمل من استلام المنتج المُرجع. تكاليف الشحن غير قابلة للاسترداد.",
+};
+
+const saleItemException = { en: "Items purchased on sale or with a discount are eligible for store credit or exchange only", ar: "المنتجات المشتراة بتخفيض أو خصم مؤهلة لرصيد المتجر أو الاستبدال فقط" };
+const misusedException = { en: "Items damaged due to customer misuse or negligence are not eligible for refunds", ar: "المنتجات التالفة بسبب سوء استخدام العميل أو إهماله غير مؤهلة للاسترداد" };
+
 export const returnPolicies: ReturnPolicy[] = [
   {
     category: "Electronics",
-    returnWindowDays: 14,
+    returnWindowDays: 3,
     conditions: [
-      { en: "Item must be in original packaging", ar: "يجب أن يكون المنتج في عبوته الأصلية" },
+      ...sharedConditions,
       { en: "All accessories must be included", ar: "يجب تضمين جميع الملحقات" },
-      { en: "Item must not show signs of use or damage", ar: "يجب ألا يظهر على المنتج علامات استخدام أو تلف" },
     ],
-    refundMethod: {
-      en: "Original payment method within 5-7 business days",
-      ar: "طريقة الدفع الأصلية خلال 5-7 أيام عمل",
-    },
+    refundMethod: standardRefundMethod,
     exceptions: [
+      saleItemException,
+      misusedException,
       { en: "Opened software or digital products cannot be returned", ar: "لا يمكن إرجاع البرامج أو المنتجات الرقمية المفتوحة" },
     ],
   },
   {
     category: "Fashion",
-    returnWindowDays: 30,
+    returnWindowDays: 3,
     conditions: [
-      { en: "Tags must still be attached", ar: "يجب أن تكون البطاقات لا تزال مرفقة" },
-      { en: "Item must be unworn and unwashed", ar: "يجب ألا يكون المنتج ملبوساً أو مغسولاً" },
-      { en: "Item must be in original packaging", ar: "يجب أن يكون المنتج في عبوته الأصلية" },
+      ...sharedConditions,
+      { en: "Tags must still be attached, item must be unworn and unwashed", ar: "يجب أن تكون البطاقات مرفقة، ولم يُلبس أو يُغسل المنتج" },
     ],
-    refundMethod: {
-      en: "Store credit or original payment method within 5-7 business days",
-      ar: "رصيد المتجر أو طريقة الدفع الأصلية خلال 5-7 أيام عمل",
-    },
+    refundMethod: standardRefundMethod,
     exceptions: [
-      { en: "Undergarments and swimwear are final sale", ar: "الملابس الداخلية وملابس السباحة لا تُرجع" },
+      saleItemException,
+      misusedException,
+      { en: "Intimate apparel is not eligible for returns", ar: "الملابس الداخلية غير قابلة للإرجاع" },
       { en: "Customized or altered items cannot be returned", ar: "لا يمكن إرجاع المنتجات المخصصة أو المعدلة" },
     ],
   },
   {
     category: "Perfumes",
-    returnWindowDays: 7,
+    returnWindowDays: 3,
     conditions: [
+      ...sharedConditions,
       { en: "Perfume must be sealed and unopened", ar: "يجب أن يكون العطر مختوماً وغير مفتوح" },
-      { en: "Original packaging must be intact", ar: "يجب أن تكون العبوة الأصلية سليمة" },
     ],
-    refundMethod: {
-      en: "Exchange or store credit only",
-      ar: "استبدال أو رصيد متجر فقط",
-    },
+    refundMethod: standardRefundMethod,
     exceptions: [
+      saleItemException,
+      misusedException,
       { en: "Opened or used perfumes cannot be returned for hygiene reasons", ar: "لا يمكن إرجاع العطور المفتوحة أو المستخدمة لأسباب صحية" },
     ],
   },
   {
     category: "Home & Kitchen",
-    returnWindowDays: 14,
+    returnWindowDays: 3,
     conditions: [
-      { en: "Item must be in original condition", ar: "يجب أن يكون المنتج في حالته الأصلية" },
+      ...sharedConditions,
       { en: "All parts and accessories must be included", ar: "يجب تضمين جميع الأجزاء والملحقات" },
     ],
-    refundMethod: {
-      en: "Original payment method within 5-7 business days",
-      ar: "طريقة الدفع الأصلية خلال 5-7 أيام عمل",
-    },
+    refundMethod: standardRefundMethod,
     exceptions: [
-      { en: "Food-related items that have been opened cannot be returned", ar: "لا يمكن إرجاع المنتجات الغذائية المفتوحة" },
+      saleItemException,
+      misusedException,
+      { en: "Perishable goods and opened food-related items cannot be returned", ar: "لا يمكن إرجاع المواد القابلة للتلف والمنتجات الغذائية المفتوحة" },
     ],
   },
   {
     category: "Kids & Toys",
-    returnWindowDays: 14,
-    conditions: [
-      { en: "Item must be in original packaging", ar: "يجب أن يكون المنتج في عبوته الأصلية" },
-      { en: "Item must be unused", ar: "يجب ألا يكون المنتج مستخدماً" },
-    ],
-    refundMethod: {
-      en: "Original payment method or store credit within 5-7 business days",
-      ar: "طريقة الدفع الأصلية أو رصيد المتجر خلال 5-7 أيام عمل",
-    },
+    returnWindowDays: 3,
+    conditions: sharedConditions,
+    refundMethod: standardRefundMethod,
     exceptions: [
+      saleItemException,
+      misusedException,
       { en: "Personalized items cannot be returned", ar: "لا يمكن إرجاع المنتجات المخصصة" },
     ],
   },

@@ -1,5 +1,5 @@
-import { streamText } from "ai";
-import { openai } from "@ai-sdk/openai";
+import { streamText, convertToModelMessages, stepCountIs } from "ai";
+import { google } from "@ai-sdk/google";
 import { SYSTEM_PROMPT } from "@/lib/ai/system-prompt";
 import { chatTools } from "@/lib/ai/tools";
 
@@ -9,9 +9,9 @@ export async function POST(req: Request) {
   const { messages } = await req.json();
 
   const result = streamText({
-    model: openai("gpt-4o-mini"),
+    model: google("gemini-2.5-flash-lite"),
     system: SYSTEM_PROMPT,
-    messages,
+    messages: await convertToModelMessages(messages),
     tools: chatTools,
   });
 

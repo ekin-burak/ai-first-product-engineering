@@ -43,7 +43,7 @@ export function ChatInput({
   };
 
   return (
-    <div className="border-t border-border bg-card p-3 sm:p-4">
+    <div className="border-t border-border/60 bg-card/80 p-3 sm:p-4">
       <form
         onSubmit={onSubmit}
         className="flex items-end gap-2"
@@ -74,7 +74,7 @@ export function ChatInput({
           type="submit"
           size="icon"
           disabled={!input.trim() || isLoading}
-          className="h-10 w-10 shrink-0 rounded-xl"
+          className="h-10 w-10 shrink-0 rounded-xl bg-gradient-to-br from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-600/90"
         >
           <Send className={cn("h-4 w-4", isRtl && "rotate-180")} />
         </Button>
