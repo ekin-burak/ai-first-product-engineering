@@ -13,6 +13,7 @@ export async function POST(req: Request) {
     system: SYSTEM_PROMPT,
     messages: await convertToModelMessages(messages),
     tools: chatTools,
+    stopWhen: [stepCountIs(10)]
   });
 
   return result.toUIMessageStreamResponse();
